@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I've Got a Question For You</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@300;400;500;600&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f0d0a;
+            font-family: 'Crimson Pro', serif;
+            position: relative;
+        }
+
+        /* Warm ambient glow */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120vmax;
+            height: 120vmax;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(180, 120, 50, 0.08) 0%,
+                rgba(120, 70, 20, 0.04) 30%,
+                rgba(15, 13, 10, 0) 70%
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Subtle grain texture */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Floating whiskey glass particles */
+        .particles {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            animation: drift linear infinite;
+        }
+
+        @keyframes drift {
+            0% { transform: translateY(110vh) scale(0.3); opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        /* Gold line accents */
+        .line-accent {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .line-top {
+            top: 30px; left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(198, 160, 90, 0.3), transparent);
+        }
+
+        .line-bottom {
+            bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(198, 160, 90, 0.3), transparent);
+        }
+
+        /* Main card */
+        .card {
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(
+                165deg,
+                rgba(30, 25, 18, 0.95) 0%,
+                rgba(22, 18, 12, 0.98) 100%
+            );
+            border: 1px solid rgba(198, 160, 90, 0.15);
+            border-radius: 4px;
+            padding: 3.5rem 4rem;
+            text-align: center;
+            max-width: 540px;
+            width: 90%;
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.6),
+                0 0 1px rgba(198, 160, 90, 0.2),
+                inset 0 1px 0 rgba(198, 160, 90, 0.08);
+            animation: cardReveal 1s ease-out;
+        }
+
+        @keyframes cardReveal {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+            display: inline-block;
+            animation: gentlePulse 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(198, 160, 90, 0.3));
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(198, 160, 90, 0.5), transparent);
+            margin: 0 auto 1.5rem;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: #e8dcc8;
+            margin-bottom: 0.4rem;
+            line-height: 1.3;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            color: rgba(198, 160, 90, 0.7);
+            font-size: 1.15rem;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+            font-style: italic;
+            letter-spacing: 0.03em;
+        }
+
+        .context {
+            color: rgba(232, 220, 200, 0.5);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            font-weight: 300;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            align-items: center;
+            min-height: 70px;
+        }
+
+        .btn-yes {
+            padding: 14px 52px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #b87a2b, #c6a05a, #b87a2b);
+            color: #1a1510;
+            box-shadow:
+                0 4px 20px rgba(184, 122, 43, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .btn-yes:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 8px 35px rgba(184, 122, 43, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #c6882f, #d4ad65, #c6882f);
+        }
+
+        .btn-no {
+            padding: 14px 52px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border: 1px solid rgba(198, 160, 90, 0.25);
+            border-radius: 2px;
+            cursor: pointer;
+            background: rgba(198, 160, 90, 0.05);
+            color: rgba(198, 160, 90, 0.6);
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        /* Result screen */
+        .result {
+            display: none;
+            animation: cardReveal 0.6s ease-out;
+        }
+
+        .result .celebration {
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .result h1 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .result p {
+            color: rgba(232, 220, 200, 0.6);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .result .whiskey-note {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(198, 160, 90, 0.15);
+            color: rgba(198, 160, 90, 0.5);
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        /* Mobile gate */
+        .mobile-gate {
+            display: none;
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .mobile-gate .icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .mobile-gate p {
+            font-family: 'Cinzel', serif;
+            color: #e8dcc8;
+            font-size: 1.3rem;
+            line-height: 1.5;
+            letter-spacing: 0.05em;
+        }
+
+        .mobile-gate .hint {
+            color: rgba(198, 160, 90, 0.4);
+            font-family: 'Crimson Pro', serif;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            font-style: italic;
+        }
+
+        /* Gold confetti */
+        .confetti-piece {
+            position: fixed;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .card { display: none !important; }
+            .line-accent { display: none; }
+            .mobile-gate { display: block; }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-gate { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="line-accent line-top"></div>
+    <div class="line-accent line-bottom"></div>
+
+    <!-- Mobile message -->
+    <div class="mobile-gate">
+        <span class="icon">💻</span>
+        <p>Use Your MacBook<br>For This One</p>
+        <p class="hint">Trust me, it'll be worth it.</p>
+    </div>
+
+    <!-- Main card -->
+    <div class="card" id="card">
+        <div id="question">
+            <div class="icon">🥃</div>
+            <div class="divider"></div>
+            <h1>Will You Be<br>My Best Man?</h1>
+            <p class="subtitle">I couldn't imagine doing this without you.</p>
+            <p class="context">Go buy yourself a bottle on me — I'll send you the money. Consider it the first round of many.</p>
+            <div class="buttons" id="buttonsArea">
+                <button class="btn-yes" onclick="sayYes()">Hell Yes</button>
+                <button class="btn-no" id="noBtn">No</button>
+            </div>
+        </div>
+        <div class="result" id="result">
+            <div class="celebration">🥃🤝🎉</div>
+            <div class="divider"></div>
+            <h1>Let's Go!</h1>
+            <p>Wouldn't have it any other way, brother.<br>Give me a call when you see this.</p>
+            <p class="whiskey-note">Check your phone — the whiskey fund is on its way. Pick something good, we've got a lot to celebrate. 🥂</p>
+        </div>
+    </div>
+
+    <script>
+        // Ambient particles
+        const particlesEl = document.getElementById('particles');
+        for (let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = 2 + Math.random() * 3;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDuration = (12 + Math.random() * 18) + 's';
+            p.style.animationDelay = (Math.random() * 12) + 's';
+
+            // Warm gold/amber tones
+            const colors = [
+                'rgba(198, 160, 90, 0.25)',
+                'rgba(184, 122, 43, 0.2)',
+                'rgba(212, 173, 101, 0.15)',
+                'rgba(255, 200, 100, 0.1)'
+            ];
+            p.style.background = colors[Math.floor(Math.random() * colors.length)];
+            p.style.boxShadow = `0 0 ${4 + Math.random() * 6}px ${p.style.background}`;
+            particlesEl.appendChild(p);
+        }
+
+        // Runaway No button
+        const noBtn = document.getElementById('noBtn');
+        let escapeCount = 0;
+
+        const messages = [
+            "NO", "SERIOUSLY?", "THINK AGAIN", "COME ON MAN",
+            "BRO...", "DON'T DO THIS", "I'LL BEG", "PLEASE?!",
+            "WRONG ANSWER", "TRY AGAIN", "JUST SAY YES"
+        ];
+
+        function moveNoButton() {
+            escapeCount++;
+
+            if (escapeCount < messages.length) {
+                noBtn.textContent = messages[escapeCount];
+            }
+
+            // Move button out of card so fixed positioning works properly
+            // (card's backdrop-filter / transforms create a containing block)
+            if (noBtn.parentElement !== document.body) {
+                document.body.appendChild(noBtn);
+            }
+
+            noBtn.style.background = 'rgba(198, 160, 90, 0.08)';
+            noBtn.style.borderColor = 'rgba(198, 160, 90, 0.35)';
+            noBtn.style.position = 'fixed';
+            noBtn.style.zIndex = '9999';
+            noBtn.style.display = 'block';
+
+            // Measure after text update
+            const btnW = noBtn.offsetWidth;
+            const btnH = noBtn.offsetHeight;
+
+            // Safe zone: 10% inset on each side
+            const vw = document.documentElement.clientWidth;
+            const vh = document.documentElement.clientHeight;
+            const minX = Math.round(vw * 0.1);
+            const minY = Math.round(vh * 0.1);
+            const maxX = Math.round(vw * 0.9) - btnW;
+            const maxY = Math.round(vh * 0.9) - btnH;
+
+            const newX = minX + Math.random() * Math.max(maxX - minX, 0);
+            const newY = minY + Math.random() * Math.max(maxY - minY, 0);
+
+            noBtn.style.left = newX + 'px';
+            noBtn.style.top = newY + 'px';
+        }
+
+        noBtn.addEventListener('mouseenter', moveNoButton);
+        noBtn.addEventListener('click', moveNoButton);
+
+        // Yes button
+        function sayYes() {
+            document.getElementById('question').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            noBtn.style.display = 'none';
+            launchConfetti();
+        }
+
+        // Gold confetti
+        function launchConfetti() {
+            const colors = ['#c6a05a', '#b87a2b', '#d4ad65', '#e8dcc8', '#8b6914', '#fff8e7', '#a0824a'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const piece = document.createElement('div');
+                    piece.className = 'confetti-piece';
+                    piece.style.left = Math.random() * 100 + 'vw';
+                    piece.style.top = '-10px';
+                    const size = 4 + Math.random() * 8;
+                    piece.style.width = size + 'px';
+                    piece.style.height = size + 'px';
+                    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '1px';
+                    piece.style.opacity = (0.3 + Math.random() * 0.7).toString();
+                    document.body.appendChild(piece);
+
+                    const duration = 2500 + Math.random() * 2500;
+                    const drift = (Math.random() - 0.5) * 150;
+                    piece.animate([
+                        { transform: 'translateY(0) translateX(0) rotate(0deg)', opacity: 1 },
+                        { transform: `translateY(100vh) translateX(${drift}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                    ], { duration, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' });
+
+                    setTimeout(() => piece.remove(), duration);
+                }, Math.random() * 1000);
+            }
+        }
+    </script>
+</body>
+</html>
